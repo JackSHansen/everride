@@ -13,10 +13,59 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id Int @id @default(autoincrement())
-  name String
-  email String @unique
+/*
+Models for car base:
+- Car mapped to table "cars"
+- Category mapped to "categories"
+- Brand mapped to "brands"
 
-  @@map("user")
+Fields chosen:
+- id: Int autoincrement primary key
+- category & brand: relations via foreign keys categoryId, brandId
+- model: String
+- year: Int
+- price: Decimal (precision 10, scale 2)
+- fueltype: enum FuelType
+- name/logo fields as String
+*/
+
+model Car {
+  id         Int       @id @default(autoincrement())
+  category   Category  @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  brand      Brand     @relation(fields: [brandId], references: [id])
+  brandId    Int
+  model      String
+  year       Int
+  price      Decimal   @db.Decimal(10, 2)
+  fueltype   FuelType
+
+  @@map("cars")
+}
+
+model Category {
+  id   Int   @id @default(autoincrement())
+  name String
+
+  cars Car[] 
+
+  @@map("categories")
+}
+
+model Brand {
+  id   Int    @id @default(autoincrement())
+  name String
+  logo String? // optional URL/path to logo
+
+  cars Car[]
+
+  @@map("brands")
+}
+
+enum FuelType {
+  PETROL
+  DIESEL
+  ELECTRIC
+  HYBRID
+  OTHER
 }
