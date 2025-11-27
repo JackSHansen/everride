@@ -104,3 +104,19 @@ export const updateRecord = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to update car' });
   }
 };
+
+export const deleteRecord = async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  if (Number.isNaN(id)) return res.status(400).json({ error: 'Invalid id' });
+  try {
+    const deleted = await prisma.car.delete({
+      where: { id },
+      select: { id: true },
+    });
+    res.json(deleted);
+  } catch (error: any) {
+    if (error?.code === 'P2025') return res.status(404).json({ error: 'Car not found' });
+    console.error('carController.deleteRecord error', error);
+    res.status(500).json({ error: 'Failed to delete car' });
+  }
+};

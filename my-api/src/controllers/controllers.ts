@@ -1,20 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../prisma.js';
 
-// Dummy mode toggle
-const USE_DUMMY = process.env.USE_DUMMY_DATA === 'true';
-
-// Dummy users (bruges kun i dummy mode)
-const D_USERS = [
-  { id: 1, name: 'Alice', email: 'alice@example.com' },
-  { id: 2, name: 'Bob',   email: 'bob@example.com'   },
-  { id: 3, name: 'Carol', email: 'carol@example.com' },
-];
-
 export const getRecords = async (req: Request, res: Response) => {
-  if (USE_DUMMY) {
-    return res.json(D_USERS);
-  }
   try {
     const data = await prisma.user.findMany();
     res.json(data);
@@ -30,13 +17,6 @@ export const getRecordById = async (req: Request, res: Response) => {
   if (Number.isNaN(id)) {
     return res.status(400).json({ error: 'Invalid id' });
   }
-
-  if (USE_DUMMY) {
-    const user = D_USERS.find(u => u.id === id);
-    if (!user) return res.status(404).json({ error: 'User not found' });
-    return res.json(user);
-  }
-
   try {
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) return res.status(404).json({ error: 'User not found' });
