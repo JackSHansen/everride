@@ -71,3 +71,36 @@ export const getRecordById = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch car' });
   }
 };
+
+export const updateRecord = async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  if (Number.isNaN(id)) return res.status(400).json({ error: 'Invalid id' });
+
+  try {
+    const { categoryId, brandId, model, year, price, fueltype } = req.body;
+
+    const data: any = {};
+    if (categoryId !== undefined) data.categoryId = Number(categoryId);
+    if (brandId !== undefined) data.brandId = Number(brandId);
+    if (model !== undefined) data.model = String(model);
+    if (year !== undefined) data.year = Number(year);
+    if (price !== undefined) data.price = Number(price);
+    if (fueltype !== undefined) data.fueltype = String(fueltype);
+
+    if (Object.keys(data).length === 0) {
+      return res.status(400).json({ error: 'No updatable fields provided' });
+    }
+
+    const updated = await prisma.car.update({
+      where: { id },
+      data,
+      select: { id: true, model: true, price: true, brandId: true, categoryId: true, fueltype: true, year: true },
+    });
+
+    res.json(updated);
+  } catch (error: any) {
+    if (error?.code === 'P2025') return res.status(404).json({ error: 'Car not found' });
+    console.error('carController.updateRecord error', error);
+    res.status(500).json({ error: 'Failed to update car' });
+  }
+};
