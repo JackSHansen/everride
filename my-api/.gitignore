@@ -1,0 +1,59 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Build / output
+dist/
+build/
+out/
+.next/
+.parcel-cache/
+.cache/
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+
+# Coverage
+coverage/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs / editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.code-workspace
+
+# Package managers
+.pnp.*
+package-lock.json
+# (If you want to commit lockfile, remove the line above)
+
+# Prisma / local DBs
+.prisma/
+*.db
+*.sqlite
+*.sqlite3
+prisma/dev.db
+
+# Misc
+.envrc
+.cache/
+.vagrant/
+tmp/
+temp/
