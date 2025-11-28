@@ -3,11 +3,13 @@ import { carsPage, carsListPage, carDetailPage } from '../controllers/controller
 
 const router = Router();
 
-// /cars
+// GET /cars -> oversigt
 router.get('/', carsPage);
-// /cars/list
+
+// GET /cars/list -> listevisning
 router.get('/list', carsListPage);
-// /cars/:id
+
+// GET /cars/:id -> detaljer (demo)
 router.get('/:id', carDetailPage);
 
 export const carsRoutes = router;

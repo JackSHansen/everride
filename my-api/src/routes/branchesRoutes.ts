@@ -3,13 +3,16 @@ import { branchesPage, jyllandPage, fynPage, sjaellandPage } from '../controller
 
 const router = Router();
 
-// /branches
+// GET /branches -> oversigt
 router.get('/', branchesPage);
-// /branches/jylland
+
+// GET /branches/jylland -> region
 router.get('/jylland', jyllandPage);
-// /branches/fyn
+
+// GET /branches/fyn -> region
 router.get('/fyn', fynPage);
-// /branches/sjaelland
+
+// GET /branches/sjaelland -> region
 router.get('/sjaelland', sjaellandPage);
 
 export const branchesRoutes = router;

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../prisma.js';
 
+// Hent alle biler (id, brandnavn, model, pris) sorteret efter højeste pris
 export const getRecords = async (req: Request, res: Response) => {
   try {
     const cars = await prisma.car.findMany({
@@ -22,11 +23,13 @@ export const getRecords = async (req: Request, res: Response) => {
 
     res.json(list);
   } catch (error) {
+    // Standard 500-fejl ved uventet fejl
     console.error('carController.getRecords error', error);
     res.status(500).json({ error: 'Failed to fetch cars' });
   }
 };
 
+// Opret en ny bilpost og returnér det nye id
 export const createRecord = async (req: Request, res: Response) => {
   try {
     const { categoryId, brandId, model, year, price, fueltype } = req.body;
@@ -44,6 +47,7 @@ export const createRecord = async (req: Request, res: Response) => {
   }
 };
 
+// Hent én bil ud fra id (validerer id og håndterer 404)
 export const getRecordById = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   if (Number.isNaN(id)) return res.status(400).json({ error: 'Invalid id' });
@@ -72,6 +76,7 @@ export const getRecordById = async (req: Request, res: Response) => {
   }
 };
 
+// Opdater felter for en bil ud fra id (kun felter i body opdateres)
 export const updateRecord = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   if (Number.isNaN(id)) return res.status(400).json({ error: 'Invalid id' });
@@ -99,12 +104,14 @@ export const updateRecord = async (req: Request, res: Response) => {
 
     res.json(updated);
   } catch (error: any) {
+    // P2025 betyder "record not found" i Prisma
     if (error?.code === 'P2025') return res.status(404).json({ error: 'Car not found' });
     console.error('carController.updateRecord error', error);
     res.status(500).json({ error: 'Failed to update car' });
   }
 };
 
+// Slet én bil ud fra id og returnér { id }
 export const deleteRecord = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   if (Number.isNaN(id)) return res.status(400).json({ error: 'Invalid id' });

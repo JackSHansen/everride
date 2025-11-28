@@ -2,41 +2,38 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { userRoutes } from './routes/userRoutes.js';
 import { siteRoutes } from './routes/siteRoutes.js';
-// Tilføjet: api routes
 import { apiCarsRoutes } from './routes/apiCarsRoutes.js';
 import { apiBrandsRoutes } from './routes/apiBrandsRoutes.js';
 import { apiCategoriesRoutes } from './routes/apiCategoriesRoutes.js';
-// Tilføjet: controller + prisma til PUT/DELETE handlers
 import { updateRecord as updateCarRecord, deleteRecord as deleteCarRecord } from './controllers/carController.js';
 import { prisma } from './prisma.js';
 
-// Indlæs miljøvariabler fra .env (uden at vise logs)
+// Indlæs env variabler (port mm.)
 dotenv.config({ quiet: true });
 
-// Brug port fra .env eller falde tilbage til 4000
+// Fald tilbage til 4000 hvis ingen port sat
 const port = process.env.serverport || 4000;
 
-// Opret express-app
 const app = express();
 
-// Gør det muligt at modtage JSON i requests
+// JSON body parsing
 app.use(express.json());
 
-// Gør det muligt at modtage form-data (fx fra formularer)
+// Form-url-encoded parsing
 app.use(express.urlencoded({ extended: true }));
 
-// Brug site-routes (forside, cars, branches, about, contact osv.)
+// Site routes (forside og statiske sider)
 app.use('/', siteRoutes);
 
-// Brug vores user-routes under /api/users
+// API: users
 app.use('/api/users', userRoutes);
 
-// Tilføjet: mount nye API-routes
+// API: domæner (cars, brands, categories)
 app.use('/api/cars', apiCarsRoutes);
 app.use('/api/brands', apiBrandsRoutes);
 app.use('/api/categories', apiCategoriesRoutes);
 
-// Tilføjet: PUT routes (update by id)
+// Ekstra endpoints: PUT/DELETE for brands & categories (cars via controller)
 app.put('/api/cars/:id', updateCarRecord);
 
 app.put('/api/brands/:id', async (req, res) => {
@@ -84,7 +81,6 @@ app.put('/api/categories/:id', async (req, res) => {
   }
 });
 
-// Tilføjet: DELETE routes (delete by id)
 app.delete('/api/cars/:id', deleteCarRecord);
 
 app.delete('/api/brands/:id', async (req, res) => {
@@ -119,7 +115,7 @@ app.delete('/api/categories/:id', async (req, res) => {
   }
 });
 
-// 404 middleware — skelner mellem API og side-forespørgsler
+// 404: returnér JSON for API, HTML for sider
 app.use((req, res) => {
   if (req.originalUrl.startsWith('/api/')) {
     return res.status(404).json({ error: 'Endpoint not found' });
@@ -130,7 +126,7 @@ app.use((req, res) => {
   `);
 });
 
-// Error-handling middleware
+// Global error handler
 app.use((err: any, req: any, res: any, _next: any) => {
   console.error('Unhandled error:', err);
   if (req.originalUrl && req.originalUrl.startsWith('/api/')) {
@@ -139,7 +135,7 @@ app.use((err: any, req: any, res: any, _next: any) => {
   res.status(500).send('<h1>500 - Internal Server Error</h1>');
 });
 
-// Start serveren
+// Start server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });

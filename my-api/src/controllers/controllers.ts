@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../prisma.js';
 
+// Hent alle users
 export const getRecords = async (req: Request, res: Response) => {
   try {
     const data = await prisma.user.findMany();
@@ -11,7 +12,7 @@ export const getRecords = async (req: Request, res: Response) => {
   }
 };
 
-// Tilføjet: hent enkelt bruger efter id
+// Hent enkelt user via id (validerer id og håndterer 404)
 export const getRecordById = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   if (Number.isNaN(id)) {
@@ -27,7 +28,7 @@ export const getRecordById = async (req: Request, res: Response) => {
   }
 };
 
-// Tilføjet: sider (grundlæggende HTML svar)
+// Forside med simple links
 export const homePage = (req: Request, res: Response) => {
   res.send(`
     <h1>Velkommen til Everride</h1>
@@ -41,8 +42,8 @@ export const homePage = (req: Request, res: Response) => {
   `);
 };
 
+// Side: Biler til salg (demoindhold)
 export const carsPage = (req: Request, res: Response) => {
-  // Eksempelindhold — udskift med DB-data efter behov
   res.send(`
     <h1>Biler til salg</h1>
     <ul>
@@ -55,9 +56,8 @@ export const carsPage = (req: Request, res: Response) => {
   `);
 };
 
-// Tilføjet: liste-visning for biler
+// Side: Listevisning (demo)
 export const carsListPage = (req: Request, res: Response) => {
-  // Simpel liste; kan senere hente fra DB
   res.send(`
     <h1>Liste over biler</h1>
     <ol>
@@ -69,10 +69,9 @@ export const carsListPage = (req: Request, res: Response) => {
   `);
 };
 
-// Tilføjet: detaljer-visning (eksempel)
+// Side: Detaljer for bil-id (demo)
 export const carDetailPage = (req: Request, res: Response) => {
   const id = req.params.id;
-  // Her kan du hente data fra DB baseret på id
   res.send(`
     <h1>Detaljer for bil #${id}</h1>
     <p>Dette er en simpel demo-side for bil med id ${id}.</p>
@@ -80,7 +79,7 @@ export const carDetailPage = (req: Request, res: Response) => {
   `);
 };
 
-// Opdateret: branchesPage med links til regioner
+// Side: Afdelinger (med regionslinks)
 export const branchesPage = (req: Request, res: Response) => {
   res.send(`
     <h1>Afdelinger</h1>
@@ -93,7 +92,7 @@ export const branchesPage = (req: Request, res: Response) => {
   `);
 };
 
-// Tilføjet: region-sider
+// Side: Region Jylland
 export const jyllandPage = (req: Request, res: Response) => {
   res.send(`
     <h1>Afdelinger - Jylland</h1>
@@ -102,6 +101,7 @@ export const jyllandPage = (req: Request, res: Response) => {
   `);
 };
 
+// Side: Region Fyn
 export const fynPage = (req: Request, res: Response) => {
   res.send(`
     <h1>Afdelinger - Fyn</h1>
@@ -110,6 +110,7 @@ export const fynPage = (req: Request, res: Response) => {
   `);
 };
 
+// Side: Region Sjælland
 export const sjaellandPage = (req: Request, res: Response) => {
   res.send(`
     <h1>Afdelinger - Sjælland</h1>
@@ -118,10 +119,9 @@ export const sjaellandPage = (req: Request, res: Response) => {
   `);
 };
 
-// Tilføjet: håndter POST fra kontaktformular
+// POST handler for kontaktformular (echoer input)
 export const contactSubmit = (req: Request, res: Response) => {
   const { name, message } = req.body;
-  // I produktion: valider/lagre besked i DB eller send mail
   res.send(`
     <h1>Tak, ${name || 'gæst'}</h1>
     <p>Vi har modtaget din besked:</p>
@@ -130,6 +130,7 @@ export const contactSubmit = (req: Request, res: Response) => {
   `);
 };
 
+// Side: Om os
 export const aboutPage = (req: Request, res: Response) => {
   res.send(`
     <h1>Om os</h1>
@@ -138,6 +139,7 @@ export const aboutPage = (req: Request, res: Response) => {
   `);
 };
 
+// Side: Kontakt (viser formular)
 export const contactPage = (req: Request, res: Response) => {
   res.send(`
     <h1>Kontakt os</h1>

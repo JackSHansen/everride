@@ -3,13 +3,13 @@ import { homePage, aboutPage, contactPage, contactSubmit } from '../controllers/
 
 const router = Router();
 
-// /  (forside)
+// Forside
 router.get('/', homePage);
 
-// /about
+// Om os
 router.get('/about', aboutPage);
 
-// /contact (GET form + POST submit)
+// Kontakt (GET viser form, POST sender)
 router.get('/contact', contactPage);
 router.post('/contact', contactSubmit);
 

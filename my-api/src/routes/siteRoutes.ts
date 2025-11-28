@@ -5,11 +5,9 @@ import { pagesRoutes } from './pagesRoutes.js';
 
 const router = Router();
 
-// Mount resource-routers
+// Mount sektioner
 router.use('/cars', carsRoutes);
 router.use('/branches', branchesRoutes);
-
-// Pages (forside, about, contact) på root
 router.use('/', pagesRoutes);
 
 export const siteRoutes = router;
