@@ -10,6 +10,7 @@ export const getRecords = async (req: Request, res: Response) => {
         model: true,
         price: true,
         brand: { select: { name: true } },
+        category: { select: { name: true } },
       },
       orderBy: { price: 'desc' },
     });
@@ -18,6 +19,7 @@ export const getRecords = async (req: Request, res: Response) => {
       id: c.id,
       brand: c.brand?.name ?? null,
       model: c.model,
+      category: c.category?.name ?? null,
       price: Number(c.price as any),
     }));
 
@@ -37,7 +39,14 @@ export const createRecord = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
     const newCar = await prisma.car.create({
-      data: { categoryId: Number(categoryId), brandId: Number(brandId), model, year: Number(year), price: Number(price), fueltype },
+      data: {
+        model,
+        year: Number(year),
+        price: Number(price),
+        fueltype,
+        brand: { connect: { id: Number(brandId) } },
+        category: { connect: { id: Number(categoryId) } },
+      },
       select: { id: true },
     });
     res.status(201).json({ id: newCar.id });
@@ -60,6 +69,7 @@ export const getRecordById = async (req: Request, res: Response) => {
         model: true,
         price: true,
         brand: { select: { name: true } },
+        category: { select: { name: true } },
       },
     });
     if (!car) return res.status(404).json({ error: 'Car not found' });
@@ -68,6 +78,7 @@ export const getRecordById = async (req: Request, res: Response) => {
       id: car.id,
       brand: car.brand?.name ?? null,
       model: car.model,
+      category: car.category?.name ?? null,
       price: Number(car.price as any),
     });
   } catch (error) {
@@ -85,8 +96,8 @@ export const updateRecord = async (req: Request, res: Response) => {
     const { categoryId, brandId, model, year, price, fueltype } = req.body;
 
     const data: any = {};
-    if (categoryId !== undefined) data.categoryId = Number(categoryId);
-    if (brandId !== undefined) data.brandId = Number(brandId);
+    if (brandId !== undefined) data.brand = { connect: { id: Number(brandId) } };
+    if (categoryId !== undefined) data.category = { connect: { id: Number(categoryId) } };
     if (model !== undefined) data.model = String(model);
     if (year !== undefined) data.year = Number(year);
     if (price !== undefined) data.price = Number(price);
@@ -125,5 +136,37 @@ export const deleteRecord = async (req: Request, res: Response) => {
     if (error?.code === 'P2025') return res.status(404).json({ error: 'Car not found' });
     console.error('carController.deleteRecord error', error);
     res.status(500).json({ error: 'Failed to delete car' });
+  }
+};
+
+// Opret brand + category ved navn (hvis de ikke findes) og forbind bilen til dem
+export const createWithRelations = async (req: Request, res: Response) => {
+  try {
+    const { brandName, categoryName, model, year, price, fueltype } = req.body;
+    if (!brandName || !categoryName || !model || !year || !price || !fueltype) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    const brand =
+      (await prisma.brand.findFirst({ where: { name: String(brandName) }, select: { id: true } })) ||
+      (await prisma.brand.create({ data: { name: String(brandName) }, select: { id: true } }));
+    const category =
+      (await prisma.category.findFirst({ where: { name: String(categoryName) }, select: { id: true } })) ||
+      (await prisma.category.create({ data: { name: String(categoryName) }, select: { id: true } }));
+
+    const newCar = await prisma.car.create({
+      data: {
+        model,
+        year: Number(year),
+        price: Number(price),
+        fueltype,
+        brand: { connect: { id: brand.id } },
+        category: { connect: { id: category.id } },
+      },
+      select: { id: true },
+    });
+    res.status(201).json({ id: newCar.id, brandId: brand.id, categoryId: category.id });
+  } catch (error) {
+    console.error('carController.createWithRelations error', error);
+    res.status(500).json({ error: 'Failed to create car with relations' });
   }
 };
