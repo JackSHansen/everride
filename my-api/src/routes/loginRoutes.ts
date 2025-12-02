@@ -3,6 +3,6 @@ import { login } from '../controllers/loginController.js';
 
 const router = Router();
 
-router.post('/', login); // POST /api/login
+router.post('/', login);
 
 export { router as loginRoutes };
