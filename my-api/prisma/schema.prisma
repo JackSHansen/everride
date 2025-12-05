@@ -11,6 +11,7 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+  referentialIntegrity = "foreignKeys"
 }
 
 /*
@@ -60,6 +61,13 @@ model Brand {
   cars Car[]
 
   @@map("brands")
+}
+
+model Fueltype {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  @@map("fueltypes")
 }
 
 enum FuelType {
